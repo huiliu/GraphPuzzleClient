@@ -15,7 +15,7 @@ namespace GraphGame.Client
         [SerializeField] private Image DRImage;
 
         private SpriteRef refs;
-        private void Awake()
+        protected virtual void Awake()
         {
             this.refs = this.GetComponent<SpriteRef>();
         }

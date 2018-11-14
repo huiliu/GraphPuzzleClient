@@ -89,12 +89,11 @@ namespace GraphGame.Logic
 
             this.GameBoard.CalcScore(r, c);
             this.Next();
+            this.CheckGameOver();
         }
 
         public void Update(float dt)
         {
-            this.CheckGameOver();
-
             //Console.WriteLine("Game.Update: {0}/{1}", this.RemainTime, dt);
             if (!this.startFlag || this.isGameOver)
                 return;

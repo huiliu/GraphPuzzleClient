@@ -11,10 +11,16 @@ namespace GraphGame.Client
         : SquareComponent
         , IPointerDownHandler
     {
+        private List<Logic.Color> LastColors = new List<Logic.Color>((int)Logic.Direction.Max);
+        protected override void Awake()
+        {
+            base.Awake();
+
+            for (var i = 0; i < (int)Logic.Direction.Max; ++i)
+                this.LastColors.Add(Logic.Color.None);
+        }
 
         public int ID;
-        private int r;
-        private int c;
         public void SetID(int id)
         {
             this.ID = id;
@@ -22,10 +28,12 @@ namespace GraphGame.Client
             this.Refresh();
         }
 
-        private IList<Logic.Color> LastColors;
         private void Refresh()
         {
-            this.LastColors = Bootstrap.Instance.Game.GetSquareColor(this.ID);
+            var colors = Bootstrap.Instance.Game.GetSquareColor(this.ID);
+            for (var i = 0; i < (int)Logic.Direction.Max; ++i)
+                this.LastColors[i] = colors[i];
+
             this.DoRefresh(this.LastColors);
         }
 
@@ -61,6 +69,8 @@ namespace GraphGame.Client
             Bootstrap.Instance.Game.Ack(Bootstrap.SinglePlayer, r, c);
         }
 
+        private int r;
+        private int c;
         private void CalcGraphRowCol()
         {
             c = this.ID % Bootstrap.Instance.Game.GraphWidth;
