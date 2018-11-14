@@ -19,12 +19,19 @@ namespace GraphGame.Logic
 
         public Square CurrentSquare { get; private set; }
         public Square NextSquare { get; private set; }
-        public int kTimeInterval = 3;
+        public int kTimeInterval = 10;  // 秒
         public float RemainTime { get; private set; }
-        public Game()
+        public int RowCount { get; private set; }
+        public int ColCount { get; private set; }
+        public int GraphWidth { get; private set; }
+        public Game(int r, int c)
         {
-            this.SquareGenerator = new SquareGenerator(this.weights, kRowSquare * kColSquare);
-            this.GameBoard = new GameBoard(2 * kRowSquare + 1, 2 * kColSquare + 1);
+            this.RowCount = r;
+            this.ColCount = c;
+            this.GraphWidth = 2 * r + 1;
+
+            this.SquareGenerator = new SquareGenerator(this.weights, this.RowCount * this.ColCount);
+            this.GameBoard = new GameBoard(2 * this.RowCount + 1, 2 * this.ColCount + 1);
         }
 
         public string RankUser { get; private set; }
@@ -61,6 +68,10 @@ namespace GraphGame.Logic
             this.GameBoard.RemovePlayer(uid);
         }
 
+        public int GetPlayerScore(string uid)
+        {
+            return this.GameBoard.PlayerScores[uid];
+        }
         /// 落子
         public void Ack(string uid, int r, int c)
         {
@@ -82,6 +93,8 @@ namespace GraphGame.Logic
 
         public void Update(float dt)
         {
+            this.CheckGameOver();
+
             //Console.WriteLine("Game.Update: {0}/{1}", this.RemainTime, dt);
             if (!this.startFlag || this.isGameOver)
                 return;
@@ -91,8 +104,11 @@ namespace GraphGame.Logic
             {
                 this.RandomAck();
             }
+        }
 
-            this.CheckGameOver();
+        public IList<Color> GetSquareColor(int idx)
+        {
+            return this.GameBoard.GetNodeColor(idx);
         }
 
         /// 玩家没有落子，随机落子
@@ -119,6 +135,8 @@ namespace GraphGame.Logic
 
             this.CurrentSquare = this.NextSquare;
             this.NextSquare = this.SquareGenerator.IsEmpty ? null : this.SquareGenerator.GetSquare();
+
+            //UnityEngine.Debug.Log(string.Format("Square Current: [{0}] Next: [{1}]", this.CurrentSquare.ToString(), this.NextSquare.ToString()));
         }
 
         public Action OnGameOver;

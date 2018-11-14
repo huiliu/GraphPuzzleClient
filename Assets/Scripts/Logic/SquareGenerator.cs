@@ -6,11 +6,17 @@ namespace GraphGame.Logic
     public class Square
     {
         public List<Color> Nodes { get; private set; }
-        public Square() { this.Nodes = new List<Color>((int)Color.Max); }
+        public Square() { this.Nodes = new List<Color>((int)Direction.Max); }
 
         public void Reset()
         {
             this.Nodes.Clear();
+        }
+
+        public void SetColor(Direction direction, Color color)
+        {
+            var i = (int)direction;
+            this.Nodes[i] = color;
         }
 
         public void AppendColor(Color color)

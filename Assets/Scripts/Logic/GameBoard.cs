@@ -60,9 +60,31 @@ namespace GraphGame.Logic
             player.GetEmptyNode(out r, out c);
         }
 
+        private List<Color> NodeColor = new List<Color> { Color.None, Color.None, Color.None, Color.None };
+        public IList<Color> GetNodeColor(int idx)
+        {
+            for (var i = 0; i < (int)Direction.Max; ++i)
+            {
+                this.NodeColor[i] = Color.None;
+            }
+
+            foreach (var kvp in this.players)
+            {
+                var colors = kvp.Value.GetNodeColor(idx);
+                for (var i = 0; i < (int)Color.Max; ++i)
+                {
+                    if (this.NodeColor[i] == Color.None && colors[i] != Color.None)
+                        this.NodeColor[i] = colors[i];
+                }
+            }
+
+            return this.NodeColor;
+        }
+
         // uid+color -> score
         public Dictionary<string, int> Scores { get; private set; }
-        public Dictionary<string, int> PlayerScores{get;private set;}
+        // uid -> score
+        public Dictionary<string, int> PlayerScores{ get; private set; }
         public void CalcScore(int r, int c)
         {
             foreach (var kvp in this.players)

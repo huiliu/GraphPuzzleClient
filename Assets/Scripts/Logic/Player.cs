@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Collections.Generic;
 
 namespace GraphGame.Logic
@@ -86,6 +87,36 @@ namespace GraphGame.Logic
                     return;
                 }
             }
+        }
+
+        private List<Color> NodeColor = new List<Color> { Color.None, Color.None, Color.None, Color.None };
+        public IList<Color> GetNodeColor(int idx)
+        {
+            for (var i = 0; i < (int)Direction.Max; ++i)
+            {
+                this.NodeColor[i] = Color.None;
+            }
+
+            var r = -1;
+            var c = -1;
+            this.GetRowCol(idx, out r, out c);
+
+            foreach (var kvp in this.graphs)
+            {
+                var successors = kvp.Value.GetNode(this.GetNodeIndex(r, c)).AllSuccessor;
+                foreach (var s in successors)
+                {
+                    var r1 = -1;
+                    var c1 = -1;
+                    this.GetRowCol(s, out r1, out c1);
+
+                    var i = (int)Utils.ToDirection(r, c, r1, c1);
+                    Debug.Assert(this.NodeColor[i] == Color.None);
+                    this.NodeColor[i] = kvp.Key;
+                }
+            }
+
+            return this.NodeColor.AsReadOnly();
         }
 
         // color -> score
