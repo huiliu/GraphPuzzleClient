@@ -21,6 +21,7 @@ namespace GraphGame.Logic
         public void AddPlayer(string uid)
         {
             this.players.Add(uid, new Player(uid, this.BoardWidth, this.BoardHeight));
+            this.PlayerScores.Add(uid, 0);
         }
 
         public void RemovePlayer(string uid)
@@ -89,7 +90,7 @@ namespace GraphGame.Logic
         {
             foreach (var kvp in this.players)
             {
-                this.PlayerScores[kvp.Key] = kvp.Value.CalcScore(r, c);
+                this.PlayerScores[kvp.Key] += kvp.Value.CalcScore(r, c);
                 foreach (var kkvp in kvp.Value.Scores)
                     this.Scores[kvp.Key + kkvp.Key.ToString()] = kkvp.Value;
             }

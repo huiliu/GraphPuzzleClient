@@ -96,16 +96,14 @@ namespace GraphGame.Logic
 
         public bool IsEmpty { get { return this.CurrentIndex >= this.SquareCount; } }
 
-        private Square Square = new Square();
         public Square GetSquare()
         {
-            this.Square.Reset();
-
+            var Square = new Square();
             foreach (var sc in this.ColorSource)
-                this.Square.AppendColor(sc[this.CurrentIndex]);
+                Square.AppendColor(sc[this.CurrentIndex]);
 
             ++this.CurrentIndex;
-            return this.Square;
+            return Square;
         }
     }
 }
