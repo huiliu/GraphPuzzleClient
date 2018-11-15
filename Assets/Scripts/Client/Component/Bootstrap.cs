@@ -16,9 +16,7 @@ namespace GraphGame.Client
         : MonoBehaviour
     {
         [SerializeField]
-        private GameObject GameNode;
-        [SerializeField]
-        private GameOverDialogComponent GameOverDialogComponent;
+        private GameComponent GameComponent;
         [SerializeField]
         private int GameBoardWidth = 3;
         [SerializeField]
@@ -26,7 +24,8 @@ namespace GraphGame.Client
 
         public static string SinglePlayer = "xyz";
         public static Bootstrap Instance { get; private set; }
-        public Game Game { get; private set; }
+
+        public Game Game { get { return this.GameComponent.Game; } }
         public GameStatus GameStatus { get; private set; }
 
         private void Awake()
@@ -38,19 +37,15 @@ namespace GraphGame.Client
 
         public void StartGame(int level)
         {
-            this.Game = new Game(this.GameBoardWidth, this.GameBoardHeight);
-            this.Game.OnGameOver = this.OnGameOver;
-            this.Game.Start(SinglePlayer);
+            this.GameComponent.StartGame(this.GameBoardWidth, this.GameBoardHeight);
+            this.GameComponent.AddPlayer(SinglePlayer);
             this.GameStatus = GameStatus.Running;
-
-            this.GameOverDialogComponent.gameObject.SetActive(false);
-            this.GameNode.SetActive(true);
         }
 
         public void TerminateGame()
         {
+            this.GameComponent.Terminate();
             this.GameStatus = GameStatus.Stop;
-            this.ShowGameOverDialog();
         }
 
         public void Pause()
@@ -61,27 +56,6 @@ namespace GraphGame.Client
         public void Resume()
         {
             this.GameStatus = GameStatus.Running;
-        }
-
-        // Update is called once per frame
-        void Update ()
-        {
-            if (this.GameStatus == GameStatus.Running)
-            {
-                this.Game.Update(Time.deltaTime);
-            }
-        }
-
-        private void OnGameOver()
-        {
-            Debug.Log(string.Format("Game Over!\n{0}", this.Game.ToString()));
-            this.ShowGameOverDialog();
-        }
-
-        private void ShowGameOverDialog()
-        {
-            this.GameOverDialogComponent.SetScore(this.Game.GetPlayerScore(SinglePlayer));
-            this.GameOverDialogComponent.gameObject.SetActive(true);
         }
     }
 }

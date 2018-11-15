@@ -122,6 +122,16 @@ namespace GraphGame.Logic
             return this.NodeColor.AsReadOnly();
         }
 
+        private Dictionary<Color, IList<List<int>>> ColorPath = new Dictionary<Color, IList<List<int>>>();
+        public IDictionary<Color, IList<List<int>>> GetPath()
+        {
+            foreach (var kvp in graphs)
+            {
+                this.ColorPath[kvp.Key] = kvp.Value.Solutions;
+            }
+
+            return this.ColorPath;
+        }
         // color -> score
         public Dictionary<Color, int> Scores { get; private set; }
         public int CalcScore(int r, int c)

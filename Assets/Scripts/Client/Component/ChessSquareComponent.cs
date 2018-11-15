@@ -73,8 +73,7 @@ namespace GraphGame.Client
         private int c;
         private void CalcGraphRowCol()
         {
-            c = this.ID % Bootstrap.Instance.Game.GraphWidth;
-            r = (this.ID - c) / Bootstrap.Instance.Game.GraphWidth;
+            Bootstrap.Instance.Game.IndxConvertToRowCol(this.ID, out r, out c);
         }
     }
 }

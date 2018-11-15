@@ -15,7 +15,41 @@ namespace GraphGame.Client
         [SerializeField] private Text Score;
         [SerializeField] private SquareComponent CurrentSquare;
         [SerializeField] private SquareComponent NextSquare;
-        
+        [SerializeField] private GameOverDialogComponent GameOverDialogComponent;
+        [SerializeField] private GameObject GameBoardNode;
+        [SerializeField] private GameObject LinePathObject;
+
+        private RectTransform GameBoardRect;
+        private void Awake()
+        {
+            this.GameBoardRect = this.GameBoardNode.GetComponent<RectTransform>();
+        }
+
+        public Game Game { get; private set; }
+        public void StartGame(int rBlock, int cBlock)
+        {
+            this.Game = new Game(rBlock, cBlock);
+            this.Game.OnGameOver = this.OnGameOver;
+            this.Game.OnSquareAck += OnGameSquareAck;
+
+            this.gameObject.SetActive(true);
+            this.GameOverDialogComponent.gameObject.SetActive(false);
+        }
+
+        public void Terminate()
+        {
+            this.Game.OnSquareAck -= OnGameSquareAck;
+            this.ShowGameOverDialog();
+        }
+
+        private string CurrentPlayer;
+        public void AddPlayer(string uid)
+        {
+            this.CurrentPlayer = uid;
+            this.Game.Start(this.CurrentPlayer);
+        }
+
+#region Refresh
         private void Refresh()
         {
             this.RefreshTimer();
@@ -39,12 +73,73 @@ namespace GraphGame.Client
             if (Bootstrap.Instance.Game.NextSquare != null)
                 this.NextSquare.Setup(Bootstrap.Instance.Game.NextSquare.Nodes);
         }
+#endregion
 
         private void Update()
         {
             if (Bootstrap.Instance.GameStatus == GameStatus.Running)
             {
+                //this.Game.Update(Time.deltaTime);
                 this.Refresh();
+            }
+        }
+
+        private void OnGameOver()
+        {
+            Debug.Log(string.Format("Game Over!\n{0}", this.Game.ToString()));
+            this.ShowGameOverDialog();
+        }
+
+        private void ShowGameOverDialog()
+        {
+            this.GameOverDialogComponent.SetScore(this.Game.GetPlayerScore(this.CurrentPlayer));
+            this.GameOverDialogComponent.gameObject.SetActive(true);
+        }
+
+        private Vector2 GameBoardSizeDelta;
+        private List<GameObject> PathMoveComponents = new List<GameObject>();
+        private void OnGameSquareAck()
+        {
+            this.GameBoardSizeDelta = this.GameBoardRect.sizeDelta;
+            var origin = this.GameBoardSizeDelta / 2;
+            origin.x = -origin.x;
+
+            var colorPath = this.Game.GetPlayerPath(this.CurrentPlayer);
+            foreach (var kvp in colorPath)
+            {
+                foreach (var points in kvp.Value)
+                {
+                    if (points.Count == 0)
+                        continue;
+
+                    var go = Instantiate(this.LinePathObject);
+                    go.transform.SetParent(this.transform, false);
+                    go.SetActive(true);
+
+                    var LinePath = go.GetComponent<LinePathComponent>();
+                    foreach (var idx in points)
+                    {
+                        var r = -1;
+                        var c = -1;
+                        var p = Vector2.zero;
+                        this.Game.IndxConvertToRowCol(idx, out r, out c);
+                        p.x = c;
+                        p.y = -r;
+                        LinePath.AppendNode(origin + p * 16);
+                    }
+
+                    LinePath.OnArriveNode += this.OnArriveNode;
+                    LinePath.Run();
+                }
+            }
+        }
+
+        private void OnArriveNode(PathMoveComponent pathMoveComponent, int idx)
+        {
+            if (pathMoveComponent.IsArrivedDst)
+            {
+                pathMoveComponent.OnArriveNode -= this.OnArriveNode;
+                Destroy(pathMoveComponent.gameObject);
             }
         }
     }

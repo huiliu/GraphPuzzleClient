@@ -75,6 +75,12 @@ namespace GraphGame.Logic
         {
             return this.GameBoard.PlayerScores[uid];
         }
+
+        public IDictionary<Color, IList<List<int>>> GetPlayerPath(string uid)
+        {
+            return this.GameBoard.GetPlayerPath(uid);
+        }
+
         /// 落子
         public void Ack(string uid, int r, int c)
         {
@@ -141,6 +147,12 @@ namespace GraphGame.Logic
             this.NextSquare = this.SquareGenerator.IsEmpty ? null : this.SquareGenerator.GetSquare();
 
             //UnityEngine.Debug.Log(string.Format("Square Current: [{0}] Next: [{1}]", this.CurrentSquare.ToString(), this.NextSquare.ToString()));
+        }
+
+        public void IndxConvertToRowCol(int idx, out int r, out int c)
+        {
+            c = idx % this.GraphWidth;
+            r = (idx - c) / this.GraphWidth;
         }
 
         public Action OnGameOver;
