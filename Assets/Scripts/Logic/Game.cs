@@ -5,6 +5,9 @@ namespace GraphGame.Logic
 {
     public class Game
     {
+        // 落子事件
+        public event Action OnSquareAck;
+
         private Dictionary<Color, int> weights = new Dictionary<Color, int>{
             {Color.None, 100},
             {Color.Red, 500},
@@ -44,7 +47,6 @@ namespace GraphGame.Logic
                 this.AddPlayer(buid);
 
             this.RankUser = auid;
-            this.GameBoard.AddColor(Color.None);
             this.GameBoard.AddColor(Color.Red);
             this.GameBoard.AddColor(Color.Green);
             this.GameBoard.AddColor(Color.Blue);
@@ -90,6 +92,8 @@ namespace GraphGame.Logic
             this.GameBoard.CalcScore(r, c);
             this.Next();
             this.CheckGameOver();
+
+            this.FireAckEvent();
         }
 
         public void Update(float dt)
@@ -158,6 +162,11 @@ namespace GraphGame.Logic
         public override string ToString()
         {
             return this.GameBoard.ToString();
+        }
+
+        private void FireAckEvent()
+        {
+            this.OnSquareAck.SafeInvoke();
         }
     }
 }

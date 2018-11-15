@@ -37,6 +37,9 @@ namespace GraphGame.Logic
 
         public void AddEdge(int r0, int c0, int r1, int c1, Color color)
         {
+            if (color == Color.None)
+                return;
+
             var g = this.graphs[color];
             var src = this.GetNodeIndex(r0, c0);
             var dst = this.GetNodeIndex(r1, c1);
