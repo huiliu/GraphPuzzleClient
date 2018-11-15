@@ -42,6 +42,7 @@ namespace GraphGame.Logic
         public void Start(string auid, string buid = "")
         {
             this.startFlag = true;
+            this.RemainTime = kTimeInterval;
             this.AddPlayer(auid);
             if (!string.IsNullOrEmpty(buid))
                 this.AddPlayer(buid);
