@@ -109,7 +109,7 @@ namespace GraphGame.Client
             {
                 foreach (var points in kvp.Value)
                 {
-                    if (points.Count == 0)
+                    if (points.Count <= 1)
                         continue;
 
                     var go = Instantiate(this.LinePathObject);
