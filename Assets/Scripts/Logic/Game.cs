@@ -22,7 +22,7 @@ namespace GraphGame.Logic
 
         public Square CurrentSquare { get; private set; }
         public Square NextSquare { get; private set; }
-        public int kTimeInterval = 10;  // 秒
+        public int kTimeInterval = 30;  // 秒
         public float RemainTime { get; private set; }
         public int RowCount { get; private set; }
         public int ColCount { get; private set; }
