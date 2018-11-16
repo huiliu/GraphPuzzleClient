@@ -18,11 +18,15 @@ namespace GraphGame.Client
         [SerializeField] private GameOverDialogComponent GameOverDialogComponent;
         [SerializeField] private GameObject GameBoardNode;
         [SerializeField] private GameObject LinePathObject;
+        [SerializeField] private GameObject BubbleScoreObject;
 
+        private LinePathComponent LinePathComponent;
         private RectTransform GameBoardRect;
         private void Awake()
         {
             this.GameBoardRect = this.GameBoardNode.GetComponent<RectTransform>();
+            this.LinePathComponent = this.LinePathObject.GetComponent<LinePathComponent>();
+            this.LinePathComponent.OnArriveNode += this.OnArriveNode;
         }
 
         public Game Game { get; private set; }
@@ -87,6 +91,7 @@ namespace GraphGame.Client
         private void OnGameOver()
         {
             Debug.Log(string.Format("Game Over!\n{0}", this.Game.ToString()));
+            this.Paths.Clear();
             this.ShowGameOverDialog();
         }
 
@@ -97,101 +102,72 @@ namespace GraphGame.Client
         }
 
         private Vector2 GameBoardSizeDelta;
-        private List<GameObject> PathMoveComponents = new List<GameObject>();
-        private Dictionary<Logic.Color, List<List<int>>> CurrentColorPath;
+        private Queue<GraphPath> Paths;
         private void OnGameSquareAck()
         {
-            this.CurrentColorPath = this.Game.GetPlayerPath(this.CurrentPlayer);
+            this.Paths = this.Game.GetPlayerPath(this.CurrentPlayer);
             this.DoDrawPath();
-
-            //var colorPath = this.Game.GetPlayerPath(this.CurrentPlayer);
-            //foreach (var kvp in colorPath)
-            //{
-            //    foreach (var points in kvp.Value)
-            //    {
-            //        if (points.Count <= 2)
-            //            continue;
-
-            //        var go = Instantiate(this.LinePathObject);
-            //        go.transform.SetParent(this.transform, false);
-            //        go.SetActive(true);
-
-            //        var LinePath = go.GetComponent<LinePathComponent>();
-            //        foreach (var idx in points)
-            //        {
-            //            var r = -1;
-            //            var c = -1;
-            //            var p = Vector2.zero;
-            //            this.Game.IndxConvertToRowCol(idx, out r, out c);
-            //            p.x = c;
-            //            p.y = -r;
-            //            LinePath.AppendNode(origin + p * 16);
-            //        }
-
-            //        LinePath.OnArriveNode += this.OnArriveNode;
-            //        LinePath.Run();
-            //    }
-            //}
         }
 
+        private GraphPath CurrentPath;
+        private IList<int> CurrentPathPoints;
         private void DoDrawPath()
         {
+
+            do
+            {
+                if (this.Paths.Count == 0)
+                {
+                    this.LinePathObject.SetActive(false);
+                    return;
+                }
+
+                this.CurrentPath = this.Paths.Dequeue();
+                this.CurrentPathPoints = this.CurrentPath.Path;
+
+                if (this.CurrentPathPoints.Count > 1)
+                    break;
+            } while (false);
+
             this.GameBoardSizeDelta = this.GameBoardRect.sizeDelta;
             var origin = this.GameBoardSizeDelta / 2;
             origin.x = -origin.x;
 
-            var curColor = Logic.Color.None;
-            var pathNum = -1;
-
-            foreach (var kvp in this.CurrentColorPath)
+            this.LinePathComponent.Reset();
+            foreach (var idx in this.CurrentPathPoints)
             {
-                curColor = kvp.Key;
-                for (var i = 0; i < kvp.Value.Count; ++i) //points in kvp.Value)
-                {
-                    var points = kvp.Value[i];
-                    if (points.Count <= 2)
-                        continue;
-
-                    var go = Instantiate(this.LinePathObject);
-                    go.transform.SetParent(this.transform, false);
-                    go.SetActive(true);
-
-                    var LinePath = go.GetComponent<LinePathComponent>();
-                    foreach (var idx in points)
-                    {
-                        var r = -1;
-                        var c = -1;
-                        var p = Vector2.zero;
-                        this.Game.IndxConvertToRowCol(idx, out r, out c);
-                        p.x = c;
-                        p.y = -r;
-                        LinePath.AppendNode(origin + p * 16);
-                    }
-
-                    LinePath.OnArriveNode += this.OnArriveNode;
-                    LinePath.Run();
-
-                    pathNum = i;
-                    break;
-                }
-
-                if (pathNum != -1)
-                    break;
+                var r = -1;
+                var c = -1;
+                var p = Vector2.zero;
+                this.Game.IndxConvertToRowCol(idx, out r, out c);
+                p.x = c;
+                p.y = -r;
+                this.LinePathComponent.AppendNode(origin + p * 16);
             }
 
-            if (curColor != Logic.Color.None && pathNum != -1)
-                this.CurrentColorPath[curColor].RemoveAt(pathNum);
+            LinePathComponent.Run();
+            this.LinePathObject.SetActive(true);
         }
 
-        private void OnArriveNode(PathMoveComponent pathMoveComponent, int idx)
+        private void OnArriveNode(PathMoveComponent pathMoveComponent, Vector3 pos, int idx)
         {
             if (pathMoveComponent.IsArrivedDst)
             {
-                pathMoveComponent.OnArriveNode -= this.OnArriveNode;
-                Destroy(pathMoveComponent.gameObject);
-
                 this.DoDrawPath();
+                return;
             }
+
+            var nodeID = this.CurrentPathPoints[idx];
+            this.ShowNodeScore(pos, this.Game.GetPlayerColorEdgeCount(this.CurrentPlayer, this.CurrentPath.Color, nodeID));
+        }
+
+        private void ShowNodeScore(Vector3 pos, int s)
+        {
+            var score = Instantiate(this.BubbleScoreObject);
+            score.GetComponent<Text>().text = "*" + s;
+            score.transform.SetParent(this.transform, false);
+            score.transform.position = pos;
+            score.SetActive(true);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace GraphGame.Client
         : MonoBehaviour
     {
         // 到达某个节点的事件
-        public event Action<PathMoveComponent, int> OnArriveNode;
+        public event Action<PathMoveComponent, Vector3, int> OnArriveNode;
 
         [SerializeField]
         protected List<Vector2> PathNode = new List<Vector2>();
@@ -41,7 +41,9 @@ namespace GraphGame.Client
 
         public void Reset()
         {
+            this.CurrentIndex = 0;
             this.PathNode.Clear();
+            this.gameObject.SetActive(false);
         }
 
         protected virtual void OnEnable()
@@ -79,7 +81,7 @@ namespace GraphGame.Client
 
         protected void FireArriveNode(int i)
         {
-            this.OnArriveNode.SafeInvoke(this, this.CurrentIndex);
+            this.OnArriveNode.SafeInvoke(this, this.BallObject.transform.position, this.CurrentIndex);
         }
 
         public bool IsArrivedDst { get { return this.CurrentIndex == this.NodeCount - 1; } } 
