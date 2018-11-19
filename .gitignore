@@ -5,4 +5,5 @@ Temp
 .vs
 *.sln
 *.csproj
-/Pack
+Pack
+doc

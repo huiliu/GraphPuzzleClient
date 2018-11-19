@@ -157,6 +157,10 @@ namespace GraphGame.Client
                 return;
             }
 
+            // 过滤掉非得分结点，偶数节点都是方块的中间点，不会得分
+            if (idx % 2 == 0)
+                return;
+
             var nodeID = this.CurrentPathPoints[idx];
             this.ShowNodeScore(pos, this.Game.GetPlayerColorEdgeCount(this.CurrentPlayer, this.CurrentPath.Color, nodeID));
         }
@@ -164,7 +168,7 @@ namespace GraphGame.Client
         private void ShowNodeScore(Vector3 pos, int s)
         {
             var score = Instantiate(this.BubbleScoreObject);
-            score.GetComponent<Text>().text = "*" + s;
+            score.GetComponent<Text>().text = "+" + s;
             score.transform.SetParent(this.transform, false);
             score.transform.position = pos;
             score.SetActive(true);
