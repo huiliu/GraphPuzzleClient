@@ -1128,7 +1128,7 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 36
+    m_FontSize: 12
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 0
@@ -1163,7 +1163,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 48, y: 48}
+  m_SizeDelta: {x: 200, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &721452151
 MonoBehaviour:
@@ -1176,7 +1176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e9ad59535749ff48b2525b54fcd0234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DelayTime: 2
+  DelayTime: 1
 --- !u!1 &778754884
 GameObject:
   m_ObjectHideFlags: 0
@@ -1209,8 +1209,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -129.99994, y: 16}
-  m_SizeDelta: {x: 190, y: 32}
+  m_AnchoredPosition: {x: -119.99994, y: 16}
+  m_SizeDelta: {x: 200, y: 32}
   m_Pivot: {x: 1.0000002, y: 0.5}
 --- !u!1 &872559106
 GameObject:
@@ -2082,7 +2082,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 110, y: 32}
+  m_SizeDelta: {x: 130, y: 32}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &1451994190
 MonoBehaviour:
@@ -2116,7 +2116,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 100
+  m_Text: 1234567890
 --- !u!222 &1451994191
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2795,7 +2795,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 80, y: 32}
+  m_SizeDelta: {x: 70, y: 32}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1805303725
 MonoBehaviour:

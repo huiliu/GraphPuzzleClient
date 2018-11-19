@@ -111,6 +111,7 @@ namespace GraphGame.Client
 
         private GraphPath CurrentPath;
         private IList<int> CurrentPathPoints;
+        private int nodeScore;
         private void DoDrawPath()
         {
 
@@ -145,6 +146,7 @@ namespace GraphGame.Client
                 this.LinePathComponent.AppendNode(origin + p * 16);
             }
 
+            nodeScore = 1;
             LinePathComponent.Run();
             this.LinePathObject.SetActive(true);
         }
@@ -162,7 +164,9 @@ namespace GraphGame.Client
                 return;
 
             var nodeID = this.CurrentPathPoints[idx];
-            this.ShowNodeScore(pos, this.Game.GetPlayerColorEdgeCount(this.CurrentPlayer, this.CurrentPath.Color, nodeID));
+            int baseScore = Utils.CalcScoreStrategy(this.Game.GetPlayerColorEdgeCount(this.CurrentPlayer, this.CurrentPath.Color, nodeID));
+            nodeScore *= baseScore;
+            this.ShowNodeScore(pos, nodeScore);
         }
 
         private void ShowNodeScore(Vector3 pos, int s)
