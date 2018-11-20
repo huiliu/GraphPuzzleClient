@@ -39,7 +39,7 @@ namespace GraphGame.Client
 
         private void Update()
         {
-            if (Bootstrap.Instance.GameStatus == GameStatus.Running)
+            if (EntryComponent.Instance.GameStatus == GameStatus.Running)
                 this.Refresh();
         }
 
@@ -66,7 +66,7 @@ namespace GraphGame.Client
                 return;
             }
 
-            Bootstrap.Instance.Game.Ack(Bootstrap.SinglePlayer, r, c);
+            Bootstrap.Instance.Game.Ack(EntryComponent.SinglePlayer, r, c);
         }
 
         private int r;

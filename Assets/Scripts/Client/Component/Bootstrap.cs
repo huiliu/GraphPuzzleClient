@@ -15,47 +15,26 @@ namespace GraphGame.Client
     public class Bootstrap
         : MonoBehaviour
     {
-        [SerializeField]
-        private GameComponent GameComponent;
-        [SerializeField]
-        private int GameBoardWidth = 3;
-        [SerializeField]
-        private int GameBoardHeight = 3;
-
-        public static string SinglePlayer = "xyz";
         public static Bootstrap Instance { get; private set; }
-
-        public Game Game { get { return this.GameComponent.Game; } }
-        public GameStatus GameStatus { get; private set; }
+        public Game Game { get { return EntryComponent.Instance.Game; } }
 
         private void Awake()
         {
             Instance = this;
-
-            this.GameStatus = GameStatus.Stop;
+            this.Init();
         }
 
-        public void StartGame(int level)
+        private void Init()
         {
-            this.GameComponent.StartGame(this.GameBoardWidth, this.GameBoardHeight);
-            this.GameComponent.AddPlayer(SinglePlayer);
-            this.GameStatus = GameStatus.Running;
+            ResourceMgr.Instance.Init();
+            ConfigMgr.Instance.Init();
         }
 
-        public void TerminateGame()
+        #region Test
+        public void TestConfig()
         {
-            this.GameComponent.Terminate();
-            this.GameStatus = GameStatus.Stop;
+            ConfigMgr.Instance.TestConfig();
         }
-
-        public void Pause()
-        {
-            this.GameStatus = GameStatus.Pause;
-        }
-
-        public void Resume()
-        {
-            this.GameStatus = GameStatus.Running;
-        }
+        #endregion
     }
 }

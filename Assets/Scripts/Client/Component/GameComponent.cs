@@ -30,9 +30,12 @@ namespace GraphGame.Client
         }
 
         public Game Game { get; private set; }
-        public void StartGame(int rBlock, int cBlock)
+        private int CurrentLevelID;
+        public void StartGame(int levelID)
         {
-            this.Game = new Game(rBlock, cBlock);
+            this.CurrentLevelID = levelID;
+            var cfg = ConfigMgr.Instance.GetLevelConfig(this.CurrentLevelID);
+            this.Game = new Game(cfg);
             this.Game.OnGameOver = this.OnGameOver;
             this.Game.OnSquareAck += OnGameSquareAck;
 
@@ -40,10 +43,15 @@ namespace GraphGame.Client
             this.GameOverDialogComponent.gameObject.SetActive(false);
         }
 
+        public void Restart()
+        {
+            this.StartGame(this.CurrentLevelID);
+        }
+
         public void Terminate()
         {
-            this.Game.OnSquareAck -= OnGameSquareAck;
-            this.ShowGameOverDialog();
+            this.Reset();
+            this.gameObject.SetActive(false);
         }
 
         private string CurrentPlayer;
@@ -53,7 +61,21 @@ namespace GraphGame.Client
             this.Game.Start(this.CurrentPlayer);
         }
 
-#region Refresh
+        public void Reset()
+        {
+            this.Game.OnGameOver = null;
+            this.Game.OnSquareAck -= OnGameSquareAck;
+            this.Paths.Clear();
+        }
+
+        private void OnGameOver()
+        {
+            Debug.Log(string.Format("Game Over!\n{0}", this.Game.ToString()));
+            this.ShowGameOverDialog();
+            this.Reset();
+        }
+
+        #region Refresh
         private void Refresh()
         {
             this.RefreshTimer();
@@ -68,7 +90,7 @@ namespace GraphGame.Client
 
         private void RefreshScore()
         {
-            this.Score.text = Bootstrap.Instance.Game.GetPlayerScore(Bootstrap.SinglePlayer).ToString();
+            this.Score.text = Bootstrap.Instance.Game.GetPlayerScore(EntryComponent.SinglePlayer).ToString();
         }
 
         private void RefreshSquare()
@@ -77,22 +99,15 @@ namespace GraphGame.Client
             if (Bootstrap.Instance.Game.NextSquare != null)
                 this.NextSquare.Setup(Bootstrap.Instance.Game.NextSquare.Nodes);
         }
-#endregion
+        #endregion
 
         private void Update()
         {
-            if (Bootstrap.Instance.GameStatus == GameStatus.Running)
+            if (EntryComponent.Instance.GameStatus == GameStatus.Running)
             {
                 //this.Game.Update(Time.deltaTime);
                 this.Refresh();
             }
-        }
-
-        private void OnGameOver()
-        {
-            Debug.Log(string.Format("Game Over!\n{0}", this.Game.ToString()));
-            this.Paths.Clear();
-            this.ShowGameOverDialog();
         }
 
         private void ShowGameOverDialog()
@@ -101,6 +116,7 @@ namespace GraphGame.Client
             this.GameOverDialogComponent.gameObject.SetActive(true);
         }
 
+        #region DrawGraphPath
         private Vector2 GameBoardSizeDelta;
         private Queue<GraphPath> Paths;
         private void OnGameSquareAck()
@@ -177,5 +193,6 @@ namespace GraphGame.Client
             score.transform.position = pos;
             score.SetActive(true);
         }
+        #endregion
     }
 }
