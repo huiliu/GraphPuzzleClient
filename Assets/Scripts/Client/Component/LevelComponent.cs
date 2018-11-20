@@ -30,7 +30,7 @@ namespace GraphGame.Client
             go.SetActive(true);
 
             var c = go.GetComponent<LevelNodeComponent>();
-            c.Setup(id, 0);
+            c.Setup(id, -1);
         }
 
         private void RemoveAllNode()

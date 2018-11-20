@@ -53,6 +53,7 @@ namespace GraphGame.Client
         public void TestConfig()
         {
             var level = new LevelData();
+            level.Seed = 10;
             level.BoardHeight = 5;
             level.BoardWidth = 5;
             level.Squares.Add(new SquareData()
@@ -72,7 +73,7 @@ namespace GraphGame.Client
                     }
                 }
             });
-            level.unUsedCellID.Add(0);
+            level.unUsedSquareID.Add(0);
             var data = new ConfigData();
             data.Levels.Add(level);
             this.SaveConfig(data);
