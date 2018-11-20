@@ -28,6 +28,7 @@ namespace GraphGame.Client
             var go = Instantiate(this.LevelNode);
             go.transform.SetParent(this.transform);
             go.SetActive(true);
+            this.Nodes.Add(go);
 
             var c = go.GetComponent<LevelNodeComponent>();
             c.Setup(id, -1);

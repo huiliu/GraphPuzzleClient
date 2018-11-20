@@ -27,9 +27,12 @@ namespace GraphGame.Client
             this.GameBoardRect = this.GameBoardNode.GetComponent<RectTransform>();
             this.LinePathComponent = this.LinePathObject.GetComponent<LinePathComponent>();
             this.LinePathComponent.OnArriveNode += this.OnArriveNode;
+            this.GameStatus = GameStatus.Stop;
         }
 
+        public static string SinglePlayer = "xyz";
         public Game Game { get; private set; }
+        public GameStatus GameStatus { get; private set; }
         private int CurrentLevelID;
         public void StartGame(int levelID)
         {
@@ -41,6 +44,8 @@ namespace GraphGame.Client
 
             this.gameObject.SetActive(true);
             this.GameOverDialogComponent.gameObject.SetActive(false);
+            this.AddPlayer(SinglePlayer);
+            this.GameStatus = GameStatus.Running;
         }
 
         public void Restart()
@@ -54,18 +59,30 @@ namespace GraphGame.Client
             this.gameObject.SetActive(false);
         }
 
+        public void Pause()
+        {
+            this.GameStatus = GameStatus.Pause;
+        }
+
+        public void Resume()
+        {
+            this.GameStatus = GameStatus.Running;
+        }
+
+        public void Reset()
+        {
+            this.GameStatus = GameStatus.Stop;
+            this.Game.OnGameOver = null;
+            this.Game.OnSquareAck -= OnGameSquareAck;
+            if (this.Paths != null)
+                this.Paths.Clear();
+        }
+
         private string CurrentPlayer;
         public void AddPlayer(string uid)
         {
             this.CurrentPlayer = uid;
             this.Game.Start(this.CurrentPlayer);
-        }
-
-        public void Reset()
-        {
-            this.Game.OnGameOver = null;
-            this.Game.OnSquareAck -= OnGameSquareAck;
-            this.Paths.Clear();
         }
 
         private void OnGameOver()
@@ -90,7 +107,7 @@ namespace GraphGame.Client
 
         private void RefreshScore()
         {
-            this.Score.text = Bootstrap.Instance.Game.GetPlayerScore(EntryComponent.SinglePlayer).ToString();
+            this.Score.text = Bootstrap.Instance.Game.GetPlayerScore(SinglePlayer).ToString();
         }
 
         private void RefreshSquare()
@@ -103,7 +120,7 @@ namespace GraphGame.Client
 
         private void Update()
         {
-            if (EntryComponent.Instance.GameStatus == GameStatus.Running)
+            if (this.GameStatus == GameStatus.Running)
             {
                 //this.Game.Update(Time.deltaTime);
                 this.Refresh();

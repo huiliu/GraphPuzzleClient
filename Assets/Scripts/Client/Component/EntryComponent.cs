@@ -10,7 +10,6 @@ namespace GraphGame.Client
     public class EntryComponent
         : MonoBehaviour
     {
-        public static string SinglePlayer = "xyz";
         public static EntryComponent Instance { get; private set; }
 
         [SerializeField]
@@ -21,33 +20,19 @@ namespace GraphGame.Client
         private void Awake()
         {
             Instance = this;
-            this.GameStatus = GameStatus.Stop;
             this.MenuMgr = new MenuMgr();
         }
 
         public Game Game { get { return this.GameComponent.Game; } }
-        public GameStatus GameStatus { get; private set; }
+        public GameStatus GameStatus { get { return this.GameComponent.GameStatus; } }
         public void StartGame(int level)
         {
             this.GameComponent.StartGame(level);
-            this.GameComponent.AddPlayer(SinglePlayer);
-            this.GameStatus = GameStatus.Running;
         }
 
         public void TerminateGame()
         {
             this.GameComponent.Terminate();
-            this.GameStatus = GameStatus.Stop;
-        }
-
-        public void Pause()
-        {
-            this.GameStatus = GameStatus.Pause;
-        }
-
-        public void Resume()
-        {
-            this.GameStatus = GameStatus.Running;
         }
 
         public MenuMgr MenuMgr { get; private set; }
@@ -67,6 +52,11 @@ namespace GraphGame.Client
         public void EnterGame()
         {
             this.MenuMgr.Execute(new EnterGameMenu());
+        }
+
+        public void Undo()
+        {
+            this.MenuMgr.Undo();
         }
     }
 }

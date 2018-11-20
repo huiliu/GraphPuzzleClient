@@ -66,7 +66,7 @@ namespace GraphGame.Client
                 return;
             }
 
-            Bootstrap.Instance.Game.Ack(EntryComponent.SinglePlayer, r, c);
+            Bootstrap.Instance.Game.Ack(GameComponent.SinglePlayer, r, c);
         }
 
         private int r;
