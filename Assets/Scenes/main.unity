@@ -170,7 +170,8 @@ MonoBehaviour:
   GameOverDialogComponent: {fileID: 400169051}
   GameBoardNode: {fileID: 457123750}
   LinePathObject: {fileID: 1163521696}
-  BubbleScoreObject: {fileID: 721452147}
+  BubbleScore: {fileID: 721452151}
+  PathShowTimePerStep: 3
 --- !u!1 &99999448
 GameObject:
   m_ObjectHideFlags: 0
@@ -1713,6 +1714,7 @@ GameObject:
   - component: {fileID: 721452150}
   - component: {fileID: 721452149}
   - component: {fileID: 721452148}
+  - component: {fileID: 721452152}
   - component: {fileID: 721452151}
   m_Layer: 5
   m_Name: BubbleScore
@@ -1787,7 +1789,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 721452147}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e9ad59535749ff48b2525b54fcd0234, type: 3}
+  m_Script: {fileID: 11500000, guid: 6433b969c5440564abf939a5a5bbf65b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &721452152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 721452147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f290c6f5d023cf42a9e2fc5beba4df8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   DelayTime: 1
