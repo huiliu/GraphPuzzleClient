@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,7 +40,7 @@ namespace GraphGame.Client
             this.CurrentLevelID = levelID;
             var cfg = ConfigMgr.Instance.GetLevelConfig(this.CurrentLevelID);
             this.Game = new Game(cfg);
-            this.Game.OnGameOver = this.OnGameOver;
+            this.Game.OnGameOver += this.OnGameOver;
             this.Game.OnSquareAck += OnGameSquareAck;
 
             this.gameObject.SetActive(true);
@@ -72,7 +73,7 @@ namespace GraphGame.Client
         public void Reset()
         {
             this.GameStatus = GameStatus.Stop;
-            this.Game.OnGameOver = null;
+            this.Game.OnGameOver -= this.OnGameOver;
             this.Game.OnSquareAck -= OnGameSquareAck;
             if (this.Paths != null)
                 this.Paths.Clear();
@@ -87,6 +88,20 @@ namespace GraphGame.Client
 
         private void OnGameOver()
         {
+            this.StartCoroutine(this.GameOverImpl());
+        }
+
+        private IEnumerator GameOverImpl()
+        {
+            do
+            {
+                if (this.Paths == null || this.Paths.Count == 0)
+                    break;
+
+                yield return null;
+            }
+            while (true);
+
             Debug.Log(string.Format("Game Over!\n{0}", this.Game.ToString()));
             this.ShowGameOverDialog();
             this.Reset();
