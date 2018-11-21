@@ -7,7 +7,6 @@ namespace GraphGame.Client
     public class LinePathComponent
         : PathMoveComponent
     {
-        private float accumulateTime = 0;
         protected override void SmoothMove(float dt)
         {
             this.accumulateTime += dt;

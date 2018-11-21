@@ -58,6 +58,7 @@ namespace GraphGame.Client
                 this.SmoothMove(Time.deltaTime);
         }
 
+        protected float accumulateTime = 0;
         protected abstract void SmoothMove(float dt);
 
         protected bool isRunning = false;
@@ -65,12 +66,14 @@ namespace GraphGame.Client
         {
             this.isRunning = true;
             this.NodeTime = this.TotalTime / this.NodeCount;
+            this.accumulateTime = 0;
         }
 
         public void Run(float nodeTime)
         {
             this.isRunning = true;
             this.NodeTime = nodeTime;
+            this.accumulateTime = 0;
         }
 
         private void DrawPath()
