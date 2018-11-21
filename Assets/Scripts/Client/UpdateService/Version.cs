@@ -5,7 +5,7 @@ using System.Text;
 
 namespace GraphGame.Client
 {
-    public class Version
+    public struct Version
     {
         public static int Major = 0;
         public static int Minor = 1;
