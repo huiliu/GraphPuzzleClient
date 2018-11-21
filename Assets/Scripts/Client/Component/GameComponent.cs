@@ -20,6 +20,7 @@ namespace GraphGame.Client
         [SerializeField] private GameObject GameBoardNode;
         [SerializeField] private GameObject LinePathObject;
         [SerializeField] private BubbleScoreComponent BubbleScore;
+        [SerializeField] private float PathShowTimePerStep;
 
         private LinePathComponent LinePathComponent;
         private RectTransform GameBoardRect;
@@ -161,10 +162,25 @@ namespace GraphGame.Client
         #region DrawGraphPath
         private Vector2 GameBoardSizeDelta;
         private Queue<GraphPath> Paths;
+        private float TimePerNode;
+        private const float kTimePerNodeThreshold = 0.5f;
         private void OnGameSquareAck()
         {
             this.Paths = this.Game.GetPlayerPath(this.CurrentPlayer);
+            this.TimePerNode = this.GetNodeMoveTime();
             this.DoDrawPath();
+        }
+
+        private float GetNodeMoveTime()
+        {
+            var totalNodeCount = 0;
+            foreach (var path in this.Paths)
+            {
+                totalNodeCount += path.Path.Count;
+            }
+
+            var v = this.PathShowTimePerStep / totalNodeCount;
+            return v < kTimePerNodeThreshold ? v : kTimePerNodeThreshold;
         }
 
         private GraphPath CurrentPath;
@@ -172,7 +188,6 @@ namespace GraphGame.Client
         private int nodeScore;
         private void DoDrawPath()
         {
-
             do
             {
                 if (this.Paths.Count == 0)
@@ -184,8 +199,8 @@ namespace GraphGame.Client
                 this.CurrentPath = this.Paths.Dequeue();
                 this.CurrentPathPoints = this.CurrentPath.Path;
 
-                if (this.CurrentPathPoints.Count > 1)
-                    break;
+                //if (this.CurrentPathPoints.Count > 1)
+                //    break;
             } while (false);
 
             this.GameBoardSizeDelta = this.GameBoardRect.sizeDelta;
@@ -205,7 +220,7 @@ namespace GraphGame.Client
             }
 
             nodeScore = 1;
-            LinePathComponent.Run();
+            LinePathComponent.Run(this.TimePerNode);
             this.LinePathObject.SetActive(true);
         }
 

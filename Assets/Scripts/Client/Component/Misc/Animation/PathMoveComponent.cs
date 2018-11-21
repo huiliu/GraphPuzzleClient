@@ -67,6 +67,12 @@ namespace GraphGame.Client
             this.NodeTime = this.TotalTime / this.NodeCount;
         }
 
+        public void Run(float nodeTime)
+        {
+            this.isRunning = true;
+            this.NodeTime = nodeTime;
+        }
+
         private void DrawPath()
         {
 #if UNITY_EDITOR
