@@ -1,3 +1,6 @@
 [submodule "Assets/Scripts/Logic"]
 	path = Assets/Scripts/Logic
 	url = https://github.com/huiliu/GraphPuzzle.git
+[submodule "Assets/Plugins/ObjectPool"]
+	path = Assets/Plugins/ObjectPool
+	url = https://github.com/huiliu/ObjectPool.git

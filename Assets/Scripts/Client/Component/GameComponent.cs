@@ -19,7 +19,7 @@ namespace GraphGame.Client
         [SerializeField] private GameOverDialogComponent GameOverDialogComponent;
         [SerializeField] private GameObject GameBoardNode;
         [SerializeField] private GameObject LinePathObject;
-        [SerializeField] private GameObject BubbleScoreObject;
+        [SerializeField] private BubbleScoreComponent BubbleScore;
 
         private LinePathComponent LinePathComponent;
         private RectTransform GameBoardRect;
@@ -29,6 +29,13 @@ namespace GraphGame.Client
             this.LinePathComponent = this.LinePathObject.GetComponent<LinePathComponent>();
             this.LinePathComponent.OnArriveNode += this.OnArriveNode;
             this.GameStatus = GameStatus.Stop;
+
+            GameObjectPool.Instance.Registe(BubbleScoreComponent.kPoolName, 5, 2, this.CreateBubbleScore);
+        }
+
+        private void OnDestroy()
+        {
+            GameObjectPool.Instance.UnRegiste(BubbleScoreComponent.kPoolName);
         }
 
         public static string SinglePlayer = "xyz";
@@ -51,6 +58,7 @@ namespace GraphGame.Client
 
         public void Restart()
         {
+            this.Reset();
             this.StartGame(this.CurrentLevelID);
         }
 
@@ -77,6 +85,8 @@ namespace GraphGame.Client
             this.Game.OnSquareAck -= OnGameSquareAck;
             if (this.Paths != null)
                 this.Paths.Clear();
+
+            this.LinePathComponent.gameObject.SetActive(false);
         }
 
         private string CurrentPlayer;
@@ -219,11 +229,18 @@ namespace GraphGame.Client
 
         private void ShowNodeScore(Vector3 pos, int s)
         {
-            var score = Instantiate(this.BubbleScoreObject);
-            score.GetComponent<Text>().text = "+" + s;
-            score.transform.SetParent(this.transform, false);
-            score.transform.position = pos;
-            score.SetActive(true);
+            var go = GameObjectPool.Instance.Rent(BubbleScoreComponent.kPoolName);
+            go.GetComponent<BubbleScoreComponent>().SetScore(s);
+            go.transform.position = pos;
+            go.SetActive(true);
+        }
+
+        private BubbleScoreComponent CreateBubbleScore()
+        {
+            var go = Instantiate(this.BubbleScore.gameObject);
+            go.transform.SetParent(this.transform, false);
+
+            return go.GetComponent<BubbleScoreComponent>();
         }
         #endregion
     }
