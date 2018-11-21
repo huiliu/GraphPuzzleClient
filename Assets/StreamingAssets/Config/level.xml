@@ -5,9 +5,9 @@
       <Seed>1</Seed>
       <BoardWidth>3</BoardWidth>
       <BoardHeight>3</BoardHeight>
-      <unUsedCellID>
+      <unUsedSquareID>
         <int>0</int>
-      </unUsedCellID>
+      </unUsedSquareID>
       <Squares>
         <SquareData>
           <Type>A</Type>
@@ -105,9 +105,9 @@
       <Seed>1</Seed>
       <BoardWidth>4</BoardWidth>
       <BoardHeight>4</BoardHeight>
-      <unUsedCellID>
+      <unUsedSquareID>
         <int>0</int>
-      </unUsedCellID>
+      </unUsedSquareID>
       <Squares>
         <SquareData>
           <Type>A</Type>
@@ -205,9 +205,9 @@
       <Seed>1</Seed>
       <BoardWidth>5</BoardWidth>
       <BoardHeight>5</BoardHeight>
-      <unUsedCellID>
+      <unUsedSquareID>
         <int>0</int>
-      </unUsedCellID>
+      </unUsedSquareID>
       <Squares>
         <SquareData>
           <Type>A</Type>
@@ -305,9 +305,9 @@
       <Seed>1</Seed>
       <BoardWidth>6</BoardWidth>
       <BoardHeight>6</BoardHeight>
-      <unUsedCellID>
+      <unUsedSquareID>
         <int>0</int>
-      </unUsedCellID>
+      </unUsedSquareID>
       <Squares>
         <SquareData>
           <Type>A</Type>
@@ -405,9 +405,9 @@
       <Seed>1</Seed>
       <BoardWidth>7</BoardWidth>
       <BoardHeight>7</BoardHeight>
-      <unUsedCellID>
+      <unUsedSquareID>
         <int>0</int>
-      </unUsedCellID>
+      </unUsedSquareID>
       <Squares>
         <SquareData>
           <Type>A</Type>

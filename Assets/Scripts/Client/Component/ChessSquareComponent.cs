@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine.EventSystems;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace GraphGame.Client
 {
@@ -11,25 +12,39 @@ namespace GraphGame.Client
         : SquareComponent
         , IPointerDownHandler
     {
+        private Image BackGround;
         private List<Logic.Color> LastColors = new List<Logic.Color>((int)Logic.Direction.Max);
         protected override void Awake()
         {
             base.Awake();
 
+            this.BackGround = this.GetComponent<Image>();
             for (var i = 0; i < (int)Logic.Direction.Max; ++i)
                 this.LastColors.Add(Logic.Color.None);
         }
 
         public int ID;
-        public void SetID(int id)
+        private bool UnusedFlag = false;
+        public void Setup(int id, bool flag)
         {
             this.ID = id;
+            this.UnusedFlag = flag;
             this.CalcGraphRowCol();
             this.Refresh();
         }
 
         private void Refresh()
         {
+            if (this.UnusedFlag)
+            {
+                this.BackGround.sprite = this.refs["unAvailable"];
+                this.TLImage.gameObject.SetActive(false);
+                this.TRImage.gameObject.SetActive(false);
+                this.DRImage.gameObject.SetActive(false);
+                this.DLImage.gameObject.SetActive(false);
+                return;
+            }
+
             var colors = Bootstrap.Instance.Game.GetSquareColor(this.ID);
             for (var i = 0; i < (int)Logic.Direction.Max; ++i)
                 this.LastColors[i] = colors[i];
@@ -39,7 +54,7 @@ namespace GraphGame.Client
 
         private void Update()
         {
-            if (EntryComponent.Instance.GameStatus == GameStatus.Running)
+            if (!this.UnusedFlag && EntryComponent.Instance.GameStatus == GameStatus.Running)
                 this.Refresh();
         }
 
@@ -59,7 +74,7 @@ namespace GraphGame.Client
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            if (!this.IsEmpty())
+            if (!this.IsEmpty() || this.UnusedFlag)
             {
                 // TODO: Show Warning Dialog.
                 Debug.LogWarning("此位置不可放置！");

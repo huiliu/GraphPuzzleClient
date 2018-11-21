@@ -9,12 +9,12 @@ namespace GraphGame.Client
     public class SquareComponent
         : MonoBehaviour
     {
-        [SerializeField] private Image TLImage;
-        [SerializeField] private Image TRImage;
-        [SerializeField] private Image DLImage;
-        [SerializeField] private Image DRImage;
+        [SerializeField] protected Image TLImage;
+        [SerializeField] protected Image TRImage;
+        [SerializeField] protected Image DLImage;
+        [SerializeField] protected Image DRImage;
 
-        private SpriteRef refs;
+        protected SpriteRef refs;
         protected virtual void Awake()
         {
             this.refs = this.GetComponent<SpriteRef>();

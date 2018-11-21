@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using GraphGame.Logic;
 
 namespace GraphGame.Client
 {
@@ -41,6 +39,7 @@ namespace GraphGame.Client
         {
             var w = Bootstrap.Instance.Game.ColCount;
             var h = Bootstrap.Instance.Game.RowCount;
+            var squareID = 0;
             for (var r = 0; r < h; ++r)
             {
                 for (var c = 0; c < w; ++c)
@@ -50,9 +49,11 @@ namespace GraphGame.Client
                     go.SetActive(true);
 
                     var square = go.GetComponent<ChessSquareComponent>();
-                    square.SetID((2*w+1)*(2*r+1)  + 2*c+1);
+                    var id = (2 * w + 1) * (2 * r + 1) + 2 * c + 1;
+                    square.Setup(id, Bootstrap.Instance.Game.Cfg.IsUnusedSquare(squareID));
 
                     this.ChessMenObject.Add(go);
+                    ++squareID;
                 }
             }
         }
