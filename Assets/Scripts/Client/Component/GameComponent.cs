@@ -168,29 +168,30 @@ namespace GraphGame.Client
         private Vector2 GameBoardSizeDelta;
         private Queue<GraphPath> Paths;
         private float TimePerNode;
-        private const float kTimePerNodeThreshold = 0.5f;
+        private int NodeScore;
+        private int DrawedLineCount;
+
         private void OnGameSquareAck()
         {
             this.Paths = this.Game.GetPlayerPath(this.CurrentPlayer);
-            this.TimePerNode = this.GetNodeMoveTime();
+            this.DrawedLineCount = 0;
             this.DoDrawPath();
         }
 
-        private float GetNodeMoveTime()
+        private void GetNodeMoveTime()
         {
-            var totalNodeCount = 0;
-            foreach (var path in this.Paths)
-            {
-                totalNodeCount += path.Path.Count;
-            }
-
-            var v = this.PathShowTimePerStep / totalNodeCount;
-            return v < kTimePerNodeThreshold ? v : kTimePerNodeThreshold;
+            if (this.DrawedLineCount < 15)
+                this.TimePerNode = 0.2f;
+            else if (this.DrawedLineCount < 80)
+                this.TimePerNode = 0.1f;
+            else if (this.DrawedLineCount < 500)
+                this.TimePerNode = 0.05f;
+            else
+                this.TimePerNode = 0.02f;
         }
 
         private GraphPath CurrentPath;
         private IList<int> CurrentPathPoints;
-        private int nodeScore;
         private void DoDrawPath()
         {
             do
@@ -224,7 +225,10 @@ namespace GraphGame.Client
                 this.LinePathComponent.AppendNode(origin + p * 16);
             }
 
-            nodeScore = 1;
+            this.GetNodeMoveTime();
+            this.DrawedLineCount += this.CurrentPathPoints.Count - 1;
+            this.NodeScore = 1;
+
             LinePathComponent.Run(this.TimePerNode);
             this.LinePathObject.SetActive(true);
         }
@@ -243,8 +247,8 @@ namespace GraphGame.Client
 
             var nodeID = this.CurrentPathPoints[idx];
             int baseScore = Utils.CalcScoreStrategy(this.Game.GetPlayerColorEdgeCount(this.CurrentPlayer, this.CurrentPath.Color, nodeID));
-            nodeScore *= baseScore;
-            this.ShowNodeScore(pos, nodeScore);
+            this.NodeScore *= baseScore;
+            this.ShowNodeScore(pos, this.NodeScore);
         }
 
         private void ShowNodeScore(Vector3 pos, int s)
