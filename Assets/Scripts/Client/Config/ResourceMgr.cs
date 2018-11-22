@@ -54,17 +54,44 @@ namespace GraphGame.Client
         public void LoadConfig(string name, Action<StreamReader> callback)
         {
             var path = this.GetConfigFileFullPath(name);
-            if (!File.Exists(path))
+            this.LoadFile(path, callback);
+        }
+        #endregion
+
+        private void LoadFile(string name, Action<StreamReader> cb)
+        {
+            if (!File.Exists(name))
             {
-                callback(null);
+                cb.SafeInvoke(null);
                 return;
             }
 
-            using (var sr = new StreamReader(path))
+            using (var sr = new StreamReader(name))
             {
-                callback.SafeInvoke(sr);
+                cb.SafeInvoke(sr);
             }
         }
-        #endregion
+
+        #region Recorder
+        private const string kVideoFilePath = "Video/";
+        public string GetVideoFileDir()
+        {
+#if DEBUG
+            return Path.Combine(Application.streamingAssetsPath, kVideoFilePath);
+#else
+            return Path.Combine(Application.persistentDataPath, kVideoFilePath);
+#endif
+        }
+        public string GetVideoFileFullPath(string name)
+        {
+            return Path.Combine(this.GetVideoFileDir(),  name);
+        }
+
+        public void LoadVideo(string name, Action<StreamReader> cb)
+        {
+            var path = this.GetVideoFileFullPath(name);
+            this.LoadFile(path, cb);
+        }
+#endregion
     }
 }

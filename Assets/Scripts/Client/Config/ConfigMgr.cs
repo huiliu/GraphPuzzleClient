@@ -53,7 +53,6 @@ namespace GraphGame.Client
         public void TestConfig()
         {
             var level = new LevelData();
-            level.Seed = 10;
             level.BoardHeight = 5;
             level.BoardWidth = 5;
             level.Squares.Add(new SquareData()

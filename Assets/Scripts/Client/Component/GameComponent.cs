@@ -47,15 +47,18 @@ namespace GraphGame.Client
         public GameBoard Game { get; private set; }
         public GameStatus GameStatus { get; private set; }
         private int CurrentLevelID;
-        public void StartGame(int levelID)
+        private Recorder Recorder;
+        public void StartGame(int levelID, int seed = 0)
         {
             this.CurrentLevelID = levelID;
 
             this.GameBoardNode.GetComponent<GameBoardComponent>().Setup(this);
+            this.Recorder = new VideoRecorder(new Version(), levelID, seed);
 
             this.Cfg = ConfigMgr.Instance.GetLevelConfig(this.CurrentLevelID);
             this.Game = new GameBoard();
-            this.Game.Init(this.Cfg);
+            this.Game.Init(this.Cfg, seed);
+            this.Game.Recorder = this.Recorder;
             this.Game.OnGameOver += this.OnGameOver;
             this.Game.OnSquareAck += OnGameSquareAck;
 
@@ -89,6 +92,8 @@ namespace GraphGame.Client
 
         public void Reset()
         {
+            this.Recorder = null;
+            this.Game.Recorder = null;
             this.GameStatus = GameStatus.Stop;
             this.Game.OnGameOver -= this.OnGameOver;
             this.Game.OnSquareAck -= OnGameSquareAck;
@@ -96,6 +101,7 @@ namespace GraphGame.Client
                 this.Paths.Clear();
 
             this.LinePathComponent.gameObject.SetActive(false);
+            this.GameOverDialogComponent.gameObject.SetActive(false);
         }
 
         private string CurrentPlayer;
@@ -125,7 +131,7 @@ namespace GraphGame.Client
             yield return this.WaitForSeconds;
             Debug.Log(string.Format("Game Over!\n{0}", this.Game.ToString()));
             this.ShowGameOverDialog();
-            this.Reset();
+            this.GameStatus = GameStatus.Stop;
         }
 
         #region Refresh
