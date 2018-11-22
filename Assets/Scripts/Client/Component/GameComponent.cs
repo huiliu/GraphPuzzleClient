@@ -21,6 +21,8 @@ namespace GraphGame.Client
         [SerializeField] private GameObject LinePathObject;
         [SerializeField] private BubbleScoreComponent BubbleScore;
         [SerializeField] private float PathShowTimePerStep;
+        // 游戏结束时对话框延时显示
+        [SerializeField] private float DelayShowGameOverDialogTimeS = 0.5f;
 
         private LinePathComponent LinePathComponent;
         private RectTransform GameBoardRect;
@@ -30,6 +32,7 @@ namespace GraphGame.Client
             this.LinePathComponent = this.LinePathObject.GetComponent<LinePathComponent>();
             this.LinePathComponent.OnArriveNode += this.OnArriveNode;
             this.GameStatus = GameStatus.Stop;
+            this.WaitForSeconds = new WaitForSeconds(this.DelayShowGameOverDialogTimeS);
 
             GameObjectPool.Instance.Registe(BubbleScoreComponent.kPoolName, 5, 2, this.CreateBubbleScore);
         }
@@ -102,6 +105,7 @@ namespace GraphGame.Client
             this.StartCoroutine(this.GameOverImpl());
         }
 
+        private WaitForSeconds WaitForSeconds;
         private IEnumerator GameOverImpl()
         {
             do
@@ -113,6 +117,7 @@ namespace GraphGame.Client
             }
             while (true);
 
+            yield return this.WaitForSeconds;
             Debug.Log(string.Format("Game Over!\n{0}", this.Game.ToString()));
             this.ShowGameOverDialog();
             this.Reset();
