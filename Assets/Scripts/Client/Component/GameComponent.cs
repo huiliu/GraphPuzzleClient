@@ -43,14 +43,19 @@ namespace GraphGame.Client
         }
 
         public static string SinglePlayer = "xyz";
-        public Game Game { get; private set; }
+        public LevelData Cfg { get; private set; }
+        public GameBoard Game { get; private set; }
         public GameStatus GameStatus { get; private set; }
         private int CurrentLevelID;
         public void StartGame(int levelID)
         {
             this.CurrentLevelID = levelID;
-            var cfg = ConfigMgr.Instance.GetLevelConfig(this.CurrentLevelID);
-            this.Game = new Game(cfg);
+
+            this.GameBoardNode.GetComponent<GameBoardComponent>().Setup(this);
+
+            this.Cfg = ConfigMgr.Instance.GetLevelConfig(this.CurrentLevelID);
+            this.Game = new GameBoard();
+            this.Game.Init(this.Cfg);
             this.Game.OnGameOver += this.OnGameOver;
             this.Game.OnSquareAck += OnGameSquareAck;
 
@@ -133,19 +138,19 @@ namespace GraphGame.Client
 
         private void RefreshTimer()
         {
-            this.Timer.text = Bootstrap.Instance.Game.RemainTime.ToString();
+            this.Timer.text = this.Game.RemainTime.ToString();
         }
 
         private void RefreshScore()
         {
-            this.Score.text = Bootstrap.Instance.Game.GetPlayerScore(SinglePlayer).ToString();
+            this.Score.text = this.Game.GetPlayerScore(SinglePlayer).ToString();
         }
 
         private void RefreshSquare()
         {
-            this.CurrentSquare.Setup(Bootstrap.Instance.Game.CurrentSquare.Nodes);
-            if (Bootstrap.Instance.Game.NextSquare != null)
-                this.NextSquare.Setup(Bootstrap.Instance.Game.NextSquare.Nodes);
+            this.CurrentSquare.Setup(this.Game.CurrentSquare.Nodes);
+            if (this.Game.NextSquare != null)
+                this.NextSquare.Setup(this.Game.NextSquare.Nodes);
         }
         #endregion
 
@@ -166,7 +171,7 @@ namespace GraphGame.Client
 
         #region DrawGraphPath
         private Vector2 GameBoardSizeDelta;
-        private Queue<GraphPath> Paths;
+        private Queue<Path> Paths;
         private float TimePerNode;
         private const float kTimePerNodeThreshold = 0.5f;
         private void OnGameSquareAck()
@@ -181,47 +186,39 @@ namespace GraphGame.Client
             var totalNodeCount = 0;
             foreach (var path in this.Paths)
             {
-                totalNodeCount += path.Path.Count;
+                totalNodeCount += path.Nodes.Count;
             }
 
             var v = this.PathShowTimePerStep / totalNodeCount;
             return v < kTimePerNodeThreshold ? v : kTimePerNodeThreshold;
         }
 
-        private GraphPath CurrentPath;
-        private IList<int> CurrentPathPoints;
+        private Path CurrentPath;
+        private List<Point> CurrentPathPoints;
         private int nodeScore;
         private void DoDrawPath()
         {
-            do
+            if (this.Paths.Count == 0)
             {
-                if (this.Paths.Count == 0)
-                {
-                    this.LinePathObject.SetActive(false);
-                    return;
-                }
-
-                this.CurrentPath = this.Paths.Dequeue();
-                this.CurrentPathPoints = this.CurrentPath.Path;
-
-                //if (this.CurrentPathPoints.Count > 1)
-                //    break;
-            } while (false);
+                this.LinePathObject.SetActive(false);
+                return;
+            }
 
             this.GameBoardSizeDelta = this.GameBoardRect.sizeDelta;
             var origin = this.GameBoardSizeDelta / 2;
             origin.x = -origin.x;
 
+            this.CurrentPath = this.Paths.Dequeue();
+            this.CurrentPathPoints = this.CurrentPath.Nodes;
+
             this.LinePathComponent.Reset();
-            foreach (var idx in this.CurrentPathPoints)
+            foreach (var p in this.CurrentPathPoints)
             {
-                var r = -1;
-                var c = -1;
-                var p = Vector2.zero;
-                this.Game.IndxConvertToRowCol(idx, out r, out c);
-                p.x = c;
-                p.y = -r;
-                this.LinePathComponent.AppendNode(origin + p * 16);
+                var v = Vector2.zero;
+                v.x = p.Col;
+                v.y = -p.Row;
+
+                this.LinePathComponent.AppendNode(origin + v * 16);
             }
 
             nodeScore = 1;
@@ -241,8 +238,8 @@ namespace GraphGame.Client
             if (idx % 2 == 0)
                 return;
 
-            var nodeID = this.CurrentPathPoints[idx];
-            int baseScore = Utils.CalcScoreStrategy(this.Game.GetPlayerColorEdgeCount(this.CurrentPlayer, this.CurrentPath.Color, nodeID));
+            var p = this.CurrentPathPoints[idx];
+            int baseScore = Utils.CalcScoreStrategy(this.Game.GetPlayerEdgeCount(this.CurrentPlayer, this.CurrentPath.Color, p.Row,p.Col));
             nodeScore *= baseScore;
             this.ShowNodeScore(pos, nodeScore);
         }

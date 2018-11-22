@@ -23,8 +23,6 @@ namespace GraphGame.Client
             this.MenuMgr = new MenuMgr();
         }
 
-        public Game Game { get { return this.GameComponent.Game; } }
-        public GameStatus GameStatus { get { return this.GameComponent.GameStatus; } }
         public void StartGame(int level)
         {
             this.GameComponent.StartGame(level);

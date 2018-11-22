@@ -16,7 +16,6 @@ namespace GraphGame.Client
         : MonoBehaviour
     {
         public static Bootstrap Instance { get; private set; }
-        public Game Game { get { return EntryComponent.Instance.Game; } }
 
         private void Awake()
         {

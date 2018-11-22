@@ -10,7 +10,6 @@ namespace GraphGame.Client
     {
         [SerializeField] private GameObject ChessMan;
 
-        private Vector2 sizeDelta = Vector2.zero;
         private RectTransform RectTransform;
         private GridLayoutGroup GridLayoutGroup;
         private List<GameObject> ChessMenObject = new List<GameObject>();
@@ -23,10 +22,6 @@ namespace GraphGame.Client
 
         private void OnEnable()
         {
-            sizeDelta.x = Bootstrap.Instance.Game.ColCount * this.GridLayoutGroup.cellSize.x;
-            sizeDelta.y = Bootstrap.Instance.Game.RowCount * this.GridLayoutGroup.cellSize.y;
-            this.RectTransform.sizeDelta = this.sizeDelta;
-
             this.InitBoard();
         }
 
@@ -35,10 +30,25 @@ namespace GraphGame.Client
             this.CleanBoard();
         }
 
+        /// <summary>
+        /// OnEnable之前执行
+        /// </summary>
+        private GameComponent GameComponent;
+        public void Setup(GameComponent gameComponent)
+        {
+            this.GameComponent = gameComponent;
+        }
+
+        private Vector2 sizeDelta = Vector2.zero;
         private void InitBoard()
         {
-            var w = Bootstrap.Instance.Game.ColCount;
-            var h = Bootstrap.Instance.Game.RowCount;
+            var w = this.GameComponent.Cfg.BoardWidth;
+            var h = this.GameComponent.Cfg.BoardHeight;
+
+            this.sizeDelta.x = w * this.GridLayoutGroup.cellSize.x;
+            this.sizeDelta.y = h * this.GridLayoutGroup.cellSize.y;
+            this.RectTransform.sizeDelta = this.sizeDelta;
+
             var squareID = 0;
             for (var r = 0; r < h; ++r)
             {
@@ -49,8 +59,7 @@ namespace GraphGame.Client
                     go.SetActive(true);
 
                     var square = go.GetComponent<ChessSquareComponent>();
-                    var id = (2 * w + 1) * (2 * r + 1) + 2 * c + 1;
-                    square.Setup(id, Bootstrap.Instance.Game.Cfg.IsUnusedSquare(squareID));
+                    square.Setup(this.GameComponent, r, c, this.GameComponent.Cfg.IsUnusedSquare(squareID));
 
                     this.ChessMenObject.Add(go);
                     ++squareID;

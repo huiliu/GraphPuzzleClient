@@ -23,13 +23,15 @@ namespace GraphGame.Client
                 this.LastColors.Add(Logic.Color.None);
         }
 
-        public int ID;
         private bool UnusedFlag = false;
-        public void Setup(int id, bool flag)
+        private int r, c;
+        private GameComponent GameComponent;
+        public void Setup(GameComponent gameComponent, int r, int c, bool flag)
         {
-            this.ID = id;
+            this.GameComponent = gameComponent;
+            this.r = r * 2 + 1;
+            this.c = c * 2 + 1;
             this.UnusedFlag = flag;
-            this.CalcGraphRowCol();
             this.Refresh();
         }
 
@@ -45,7 +47,7 @@ namespace GraphGame.Client
                 return;
             }
 
-            var colors = Bootstrap.Instance.Game.GetSquareColor(this.ID);
+            var colors = this.GameComponent.Game.GetSquareColor(r, c);
             for (var i = 0; i < (int)Logic.Direction.Max; ++i)
                 this.LastColors[i] = colors[i];
 
@@ -54,7 +56,7 @@ namespace GraphGame.Client
 
         private void Update()
         {
-            if (!this.UnusedFlag && EntryComponent.Instance.GameStatus == GameStatus.Running)
+            if (!this.UnusedFlag && this.GameComponent.GameStatus == GameStatus.Running)
                 this.Refresh();
         }
 
@@ -81,14 +83,7 @@ namespace GraphGame.Client
                 return;
             }
 
-            Bootstrap.Instance.Game.Ack(GameComponent.SinglePlayer, r, c);
-        }
-
-        private int r;
-        private int c;
-        private void CalcGraphRowCol()
-        {
-            Bootstrap.Instance.Game.IndxConvertToRowCol(this.ID, out r, out c);
+            this.GameComponent.Game.Ack(GameComponent.SinglePlayer, r, c);
         }
     }
 }
