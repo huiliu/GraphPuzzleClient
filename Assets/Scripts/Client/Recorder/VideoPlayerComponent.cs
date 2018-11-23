@@ -10,10 +10,13 @@ namespace GraphGame.Client
         : MonoBehaviour
     {
         [SerializeField] int Speed = 8;
-        [SerializeField] GameComponent GameComponent;
+        [SerializeField] GameObject GameNode;
+        [SerializeField] GameBoardComponent GameBoardComponent;
         [SerializeField] VideoFileComponent VideoFileComponent;
         [SerializeField] GameObject FileListNode;
-        [SerializeField] GameObject OperationNode;
+        [SerializeField] SquareComponent CurrentSquare;
+        [SerializeField] SquareComponent NextSquare;
+        [SerializeField] GameObject GameOverNode;
         private const float kStepInvervalS = 8f;
 
         protected void Awake()
@@ -30,7 +33,7 @@ namespace GraphGame.Client
         {
             this.InitPlayer();
             this.FileListNode.SetActive(true);
-            this.OperationNode.SetActive(false);
+            this.GameNode.SetActive(false);
         }
 
         protected void OnDisable()
@@ -97,17 +100,31 @@ namespace GraphGame.Client
         private bool isPlaying = false;
         private void Play(int idx)
         {
-            Data.Load(ResourceMgr.Instance.GetVideoFileFullPath(Videos[idx]));
             ResourceMgr.Instance.LoadVideo(this.Videos[idx], this.ParseRecordData);
 
             this.isPlaying = true;
             this.isPause = false;
             this.accumulateTime = 0;
             this.CurrentStepIndex = 0;
-            this.GameComponent.StartGame(this.Data.LevelID, this.Data.Seed);
+
+            this.StartGame();
             this.RefreshStepInterval();
+
             this.FileListNode.SetActive(false);
-            this.OperationNode.SetActive(true);
+            this.GameNode.SetActive(true);
+            this.RefreshUI();
+        }
+
+        private GameBoard Game;
+        public void StartGame()
+        {
+            var levelCfg = ConfigMgr.Instance.GetLevelConfig(this.Data.LevelID);
+            this.Game = new GameBoard();
+            this.Game.Init(levelCfg, this.Data.Seed);
+            this.Game.OnGameOver += this.HandleGameOver;
+            this.Game.Start(this.Data.PlayerA, this.Data.PlayerB);
+
+            this.GameBoardComponent.Setup(levelCfg.BoardWidth, levelCfg.BoardHeight, levelCfg.unUsedSquareID);
         }
 
         private void RefreshStepInterval()
@@ -134,9 +151,31 @@ namespace GraphGame.Client
 
             this.accumulateTime = 0;
             var step = this.Data.Steps[this.CurrentStepIndex];
-            this.GameComponent.Game.Ack(step.UID, step.Row, step.Col);
+            this.Game.Ack(step.UID, step.Row, step.Col);
+            this.RefreshUI();
 
             ++this.CurrentStepIndex;
+        }
+
+        private void RefreshUI()
+        {
+            this.GameBoardComponent.Refresh(this.Game);
+
+            this.CurrentSquare.Setup(this.Game.CurrentSquare.Nodes);
+            if (this.Game.NextSquare != null)
+                this.NextSquare.Setup(this.Game.NextSquare.Nodes);
+        }
+
+        private void HandleGameOver()
+        {
+            this.isPlaying = false;
+            this.isPause = false;
+            this.Game.OnGameOver -= this.HandleGameOver;
+
+            var component = this.GameOverNode.GetComponent<GameOverDialogComponent>();
+            component.SetScore(this.Game.GetPlayerScore(this.Data.PlayerA));
+
+            this.GameOverNode.SetActive(true);
         }
 
         private VideoFileComponent CreateVideoFileComponent()

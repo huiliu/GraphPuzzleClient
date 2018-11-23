@@ -43,6 +43,7 @@ namespace GraphGame.Client
         private void OnBoardSquareClick(int r, int c)
         {
             this.Game.Ack(this.CurrentPlayer, r, c);
+            this.Refresh();
         }
 
         private LinePathComponent LinePathComponent;
@@ -63,13 +64,12 @@ namespace GraphGame.Client
             GameObjectPool.Instance.UnRegiste(BubbleScoreComponent.kPoolName);
         }
 
-        public static string SinglePlayer = "xyz";
         public LevelData Cfg { get; private set; }
         public GameBoard Game { get; private set; }
         public GameStatus GameStatus { get; private set; }
         private int CurrentLevelID;
         private Recorder Recorder;
-        public void StartGame(int levelID, int seed = 0)
+        public void InitGame(int levelID, int seed = 0)
         {
             this.CurrentLevelID = levelID;
 
@@ -82,17 +82,25 @@ namespace GraphGame.Client
             this.Game.OnSquareAck += OnGameSquareAck;
 
             this.GameBoardComponent.Setup(this.Cfg.BoardWidth, this.Cfg.BoardHeight, this.Cfg.unUsedSquareID);
+        }
+
+        private string CurrentPlayer;
+        public void StartGame(string me, string other = "")
+        {
+            this.CurrentPlayer = me;
+            this.Game.Start(me, other);
+            this.GameStatus = GameStatus.Running;
 
             this.gameObject.SetActive(true);
             this.GameOverDialogComponent.gameObject.SetActive(false);
-            this.AddPlayer(SinglePlayer);
-            this.GameStatus = GameStatus.Running;
+            this.Refresh();
         }
 
         public void Restart()
         {
             this.Reset();
-            this.StartGame(this.CurrentLevelID);
+            this.InitGame(this.CurrentLevelID);
+            this.StartGame(this.CurrentPlayer);
         }
 
         public void Terminate()
@@ -123,13 +131,6 @@ namespace GraphGame.Client
 
             this.LinePathComponent.gameObject.SetActive(false);
             this.GameOverDialogComponent.gameObject.SetActive(false);
-        }
-
-        private string CurrentPlayer;
-        public void AddPlayer(string uid)
-        {
-            this.CurrentPlayer = uid;
-            this.Game.Start(this.CurrentPlayer);
         }
 
         private void OnGameOver()
@@ -171,7 +172,7 @@ namespace GraphGame.Client
 
         private void RefreshScore()
         {
-            this.Score.text = this.Game.GetPlayerScore(SinglePlayer).ToString();
+            this.Score.text = this.Game.GetPlayerScore(this.CurrentPlayer).ToString();
         }
 
         private void RefreshSquare()
@@ -187,7 +188,6 @@ namespace GraphGame.Client
             if (this.GameStatus == GameStatus.Running)
             {
                 //this.Game.Update(Time.deltaTime);
-                this.Refresh();
             }
         }
 

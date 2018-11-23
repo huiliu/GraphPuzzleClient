@@ -23,9 +23,11 @@ namespace GraphGame.Client
             this.MenuMgr = new MenuMgr();
         }
 
+        private const string kSinglePlayer = "xyz";
         public void StartGame(int level)
         {
-            this.GameComponent.StartGame(level);
+            this.GameComponent.InitGame(level);
+            this.GameComponent.StartGame(kSinglePlayer);
         }
 
         public void TerminateGame()

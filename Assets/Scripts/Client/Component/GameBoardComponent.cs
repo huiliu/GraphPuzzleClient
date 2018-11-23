@@ -12,20 +12,6 @@ namespace GraphGame.Client
         public event Action<int, int> OnClick;
         [SerializeField] private GameObject ChessMan;
 
-        private RectTransform RectTransform;
-        private GridLayoutGroup GridLayoutGroup;
-
-        private void Awake()
-        {
-            this.RectTransform = this.GetComponent<RectTransform>();
-            this.GridLayoutGroup = this.GetComponent<GridLayoutGroup>();
-        }
-
-        private void OnEnable()
-        {
-            this.InitBoard(this.width, this.height);
-        }
-
         private void OnDisable()
         {
             this.CleanBoard();
@@ -42,6 +28,9 @@ namespace GraphGame.Client
             this.width = w;
             this.height = h;
             this.unusedSquareID = unusedSquareID;
+
+            this.CleanBoard();
+            this.InitBoard(this.width, this.height);
         }
 
         public void Refresh(GameBoard gameBoard)
@@ -55,13 +44,16 @@ namespace GraphGame.Client
             return this.unusedSquareID.FindIndex(item => item == sid) != -1;
         }
 
-        private Vector2 sizeDelta = Vector2.zero;
         private List<ChessSquareComponent> Chesses = new List<ChessSquareComponent>();
         private void InitBoard(int w, int h)
         {
-            this.sizeDelta.x = w * this.GridLayoutGroup.cellSize.x;
-            this.sizeDelta.y = h * this.GridLayoutGroup.cellSize.y;
-            this.RectTransform.sizeDelta = this.sizeDelta;
+            var RectTransform = this.GetComponent<RectTransform>();
+            var GridLayoutGroup = this.GetComponent<GridLayoutGroup>();
+            var sizeDelta = Vector2.zero;
+
+            sizeDelta.x = w * GridLayoutGroup.cellSize.x;
+            sizeDelta.y = h * GridLayoutGroup.cellSize.y;
+            RectTransform.sizeDelta = sizeDelta;
 
             var squareID = 0;
             for (var r = 0; r < h; ++r)
