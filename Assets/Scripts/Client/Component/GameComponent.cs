@@ -24,6 +24,27 @@ namespace GraphGame.Client
         // 游戏结束时对话框延时显示
         [SerializeField] private float DelayShowGameOverDialogTimeS = 0.5f;
 
+        private GameBoardComponent gameBoardComponent;
+        private GameBoardComponent GameBoardComponent
+        {
+            get
+            {
+                if (this.gameBoardComponent == null)
+                {
+                    this.gameBoardComponent = this.GameBoardNode.GetComponent<GameBoardComponent>();
+                    // TODO: 坏代码的味道
+                    this.gameBoardComponent.OnClick += OnBoardSquareClick;
+                }
+
+                return this.gameBoardComponent;
+            }
+        }
+
+        private void OnBoardSquareClick(int r, int c)
+        {
+            this.Game.Ack(this.CurrentPlayer, r, c);
+        }
+
         private LinePathComponent LinePathComponent;
         private RectTransform GameBoardRect;
         private void Awake()
@@ -52,15 +73,15 @@ namespace GraphGame.Client
         {
             this.CurrentLevelID = levelID;
 
-            this.GameBoardNode.GetComponent<GameBoardComponent>().Setup(this);
             this.Recorder = new VideoRecorder(new Version(), levelID, seed);
-
             this.Cfg = ConfigMgr.Instance.GetLevelConfig(this.CurrentLevelID);
             this.Game = new GameBoard();
             this.Game.Init(this.Cfg, seed);
             this.Game.Recorder = this.Recorder;
             this.Game.OnGameOver += this.OnGameOver;
             this.Game.OnSquareAck += OnGameSquareAck;
+
+            this.GameBoardComponent.Setup(this.Cfg.BoardWidth, this.Cfg.BoardHeight, this.Cfg.unUsedSquareID);
 
             this.gameObject.SetActive(true);
             this.GameOverDialogComponent.gameObject.SetActive(false);
@@ -140,6 +161,7 @@ namespace GraphGame.Client
             this.RefreshTimer();
             this.RefreshScore();
             this.RefreshSquare();
+            this.GameBoardComponent.Refresh(this.Game);
         }
 
         private void RefreshTimer()

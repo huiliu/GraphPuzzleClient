@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine.EventSystems;
 using UnityEngine;
 using UnityEngine.UI;
+using GraphGame.Logic;
 
 namespace GraphGame.Client
 {
@@ -12,6 +13,8 @@ namespace GraphGame.Client
         : SquareComponent
         , IPointerDownHandler
     {
+        public event Action<int, int> OnClick;
+
         private Image BackGround;
         private List<Logic.Color> LastColors = new List<Logic.Color>((int)Logic.Direction.Max);
         protected override void Awake()
@@ -25,17 +28,14 @@ namespace GraphGame.Client
 
         private bool UnusedFlag = false;
         private int r, c;
-        private GameComponent GameComponent;
-        public void Setup(GameComponent gameComponent, int r, int c, bool flag)
+        public void Setup(int r, int c, bool flag)
         {
-            this.GameComponent = gameComponent;
             this.r = r * 2 + 1;
             this.c = c * 2 + 1;
             this.UnusedFlag = flag;
-            this.Refresh();
         }
 
-        private void Refresh()
+        public void Refresh(GameBoard Game)
         {
             if (this.UnusedFlag)
             {
@@ -47,17 +47,11 @@ namespace GraphGame.Client
                 return;
             }
 
-            var colors = this.GameComponent.Game.GetSquareColor(r, c);
+            var colors = Game.GetSquareColor(r, c);
             for (var i = 0; i < (int)Logic.Direction.Max; ++i)
                 this.LastColors[i] = colors[i];
 
             this.DoRefresh(this.LastColors);
-        }
-
-        private void Update()
-        {
-            if (!this.UnusedFlag && this.GameComponent.GameStatus == GameStatus.Running)
-                this.Refresh();
         }
 
         private bool IsEmpty()
@@ -83,7 +77,13 @@ namespace GraphGame.Client
                 return;
             }
 
-            this.GameComponent.Game.Ack(GameComponent.SinglePlayer, r, c);
+            //this.GameComponent.Game.Ack(GameComponent.SinglePlayer, r, c);
+            this.FireClickEvent();
+        }
+
+        private void FireClickEvent()
+        {
+            this.OnClick.SafeInvoke(r, c);
         }
     }
 }
